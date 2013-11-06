@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	    <meta charset="utf-8">
+	    <title>JSON Inspector</title>
+	    <!-- <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.3.0/base-min.css"> -->
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	    <link rel="stylesheet" type="text/css" href="css/bootstrap.cyborg.min.css">
+	    <link rel="stylesheet" type="text/css" href="css/bootstrap-sortable.css">
+
+	    <style type="text/css">
+		    body {
+			  padding-top: 50px;
+			}
+		
+		</style>
+	</head>
+	<body>
+	  	<div class="navbar navbar-inverse navbar-fixed-top">
+	      	<div class="container">
+		        <div class="navbar-header">
+		          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+		            <span class="icon-bar"></span>
+		            <span class="icon-bar"></span>
+		            <span class="icon-bar"></span>
+		          </button>
+		          <a class="navbar-brand" href="#">JSON inspector</a>
+		        </div>
+		        <div class="navbar-collapse collapse">
+			        <ul class="nav navbar-nav">
+		            </ul>
+		        </div>
+	        </div>
+	    </div>
+      
+		<div id="main" class="container">
+		    <div class="page-header">
+		        <h1 class="json_file"></h1>
+			        <p class="lead">Examine some log files.</p>
+		    </div>
+
+	    	<div class="json"></div>
+	    </div>
+
+  	</body>
+
+	    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" ></script>
+	    <script src="js/bootstrap.min.js" ></script>
+	    <script src="js/bootstrap-sortable.js" ></script>
+	    <script src="js/moment.min.js" ></script>
+	    <script src="json_to_html_table.js"></script>
+	    <script type="text/javascript">
+
+	    	// files=["urls.json","hashtags.json","mentions.json","txt.json","entities.json"]
+	    	files=[]
+	    	filelist="filelist"
+
+	    	$.get(filelist, function(raw) {
+	    		paths=raw.split(/\r?\n/)
+	    		
+	    		for (var i = 0; i < paths.length; i++) {
+	    			// base=paths[i].substr(paths[i].indexOf('/'));
+	    			base="logs/";
+	    			file=paths[i].substr(paths[i].lastIndexOf('/')+1);
+	    			console.log(base+file);
+	    			files.push(base+file)
+	    		}
+
+	    	}).success(function(){
+
+		    	console.log(files)		    
+
+		    	for (var i = 0; i < files.length; i++) {
+		    		console.log(i);
+		    		$("ul.nav").append("<li><a>"+files[i]+"</a></li>");
+		    	}
+
+		    	$("ul.nav li a").click(function(e){
+		    		filename=$(this).html();
+		    		console.log(filename);
+		    		display_file(filename);
+		    	})
+
+
+		    	display_file(files[0]);
+	    	});
+
+	    	function display_file (_filename) {
+
+		    	$.get( _filename, function( data ) {
+				  	
+				  	var ok_data=[];
+
+		    		// remove small datas
+				   	for (var i=0; i<data.length; i++) {
+				   		if (data[i].tweets > 3 || data[i].users > 3) ok_data.push(data[i])
+				   	}
+
+				    var jsonHtmlTable = ConvertJsonToTable(ok_data, 'data', null, null);
+				    
+				    // parse html
+				    $("div.json").html(jsonHtmlTable);
+				    $("#data").addClass("table table-striped sortable");
+					
+					// refresh sortable
+				    $.bootstrapSortable(true);
+
+				    // add title
+				    $(".json_file").html(_filename);
+
+				}).fail(function(){ 
+					display_alert("danger","cannot load file",_filename)
+				}).success(function(){
+					display_alert("success","file loaded",_filename)
+				})
+					;		    		
+	    	}
+
+	    	function display_alert(_type,_event,_text) {
+
+	    		var html='<div class="alert alert-'+_type+' alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><strong>'+_event+' : </strong> '+_text+'</div>'
+		    	
+		    	
+		    	// console.log(html);
+		    	$("#main").prepend(html);
+		    }
+
+	    </script>
+
+</html>
