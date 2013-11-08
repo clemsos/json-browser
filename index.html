@@ -57,10 +57,14 @@
 
 	    	$.get(filelist, function(raw) {
 	    		paths=raw.split(/\r?\n/)
+    			
+    			// TODO : make this parametric
+    			base="logs/";
+	    		// console.log(paths.length-1)
+	    		// console.log(paths[6]);
 	    		
 	    		for (var i = 0; i < paths.length; i++) {
 	    			// base=paths[i].substr(paths[i].indexOf('/'));
-	    			base="logs/";
 	    			file=paths[i].substr(paths[i].lastIndexOf('/')+1);
 	    			console.log(base+file);
 	    			files.push(base+file)
@@ -68,10 +72,7 @@
 
 	    	}).success(function(){
 
-		    	console.log(files)		    
-
 		    	for (var i = 0; i < files.length; i++) {
-		    		console.log(i);
 		    		$("ul.nav").append("<li><a>"+files[i]+"</a></li>");
 		    	}
 
@@ -80,7 +81,6 @@
 		    		console.log(filename);
 		    		display_file(filename);
 		    	})
-
 
 		    	display_file(files[0]);
 	    	});
@@ -91,7 +91,7 @@
 				  	
 				  	var ok_data=[];
 
-		    		// remove small datas
+		    		// TODO : make this optional remove small datas
 				   	for (var i=0; i<data.length; i++) {
 				   		if (data[i].tweets > 3 || data[i].users > 3) ok_data.push(data[i])
 				   	}
@@ -107,6 +107,12 @@
 
 				    // add title
 				    $(".json_file").html(_filename);
+
+				    // open links in a new window
+				    console.log($("td a"))
+				    $("td a").attr("target","_blank");
+				    // add weibo URL decrypter
+				    // https://api.weibo.com/2/short_url/expand.json?access_token=2.00WSLtpB0GRHJ9745670860ceNWWiC&url_short=http://t.cn/SxmdFr
 
 				}).fail(function(){ 
 					display_alert("danger","cannot load file",_filename)
