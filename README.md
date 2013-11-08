@@ -5,3 +5,5 @@
 Usage :
 
 	bash jsonviewer.sh [rep containing your json files]
+
+You can browse on localhost:8000
